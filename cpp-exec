@@ -1,0 +1,28 @@
+#!/bin/bash
+
+prog="$@"
+MAX_CHAR=10000
+BUFFER_TIME=0.1
+
+execute() {
+	echo "./$prog"
+	./$prog
+}
+
+await_press() {
+	# Swallow remaining output to prevent exit on error
+	read -t $BUFFER_TIME -N $MAX_CHAR output
+
+	[ -n "$output" ] && printf "Remaining output:\n$output"
+	echo "Press any key to continue"
+	while [ true ] ; do
+		read -t 3 -n 1 
+		if [ $? = 0 ]; then
+			exit
+		fi
+  	done
+}
+
+execute
+trap 'await_press' EXIT
+
