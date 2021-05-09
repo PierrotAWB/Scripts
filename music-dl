@@ -4,15 +4,25 @@ YDL_FLAGS="-f 251"
 SAMPLING_RATE=48000
 DOWNLOAD_DIR=$HOME/videos
 OUTPUT_DIR=$HOME/music
-
-set -x
+DO_CUT=false
 
 main() {
 	if [ "$#" -eq 0 ]; then
-    	echo "Usage: music-dl [url]"
+    	echo "Usage: music-dl -i [url] [-s start_time] [-e end_time]"
 		exit 1
 	else 
-		URL=$1
+		while getopts "i:s:e:" o; do case "${o}" in
+			i) URL=${OPTARG} ;;
+			s) START_TIME=${OPTARG} 
+			   DO_CUT=true ;;
+			e) END_TIME=${OPTARG} 
+			   DO_CUT=true ;;
+		esac done
+	fi
+
+	if [ -z "$URL" ]; then
+		printf "Error: Expected URL.\nUsage: music-dl -i [url] [-s start_time] [-e end_time]\n"
+		exit 1
 	fi
 
 	# Youtube-dl dry-run to get output file name.
@@ -22,7 +32,23 @@ main() {
 	echo "OUTPUT PATH: $OUTPUT_DIR/${FILENAME%.webm}.mp3"
 
 	youtube-dl -f 251 "$URL" || echo "Something went wrong while downloading."
-	ffmpeg -i "$DOWNLOAD_PATH" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
+
+	# Completely janky way to handle start and end time handover to ffmpeg.
+	if [ -n "$START_TIME" ]; then
+		if [ -n "$END_TIME" ]; then
+			ffmpeg -i "$DOWNLOAD_PATH" -ss "$START_TIME" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
+		else 
+			ffmpeg -i "$DOWNLOAD_PATH" -ss "$START_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
+		fi
+	elif [ -n "$END_TIME" ]; then
+		ffmpeg -i "$DOWNLOAD_PATH" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm}"
+	fi
+
+	if [ "$DO_CUT" = true ]; then
+		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
+	else 
+		ffmpeg -i "$DOWNLOAD_PATH" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
+	fi
 }
 
 main "$@"
