@@ -1,0 +1,28 @@
+#!/bin/bash
+
+YDL_FLAGS="-f 251"
+SAMPLING_RATE=48000
+DOWNLOAD_DIR=$HOME/videos
+OUTPUT_DIR=$HOME/music
+
+set -x
+
+main() {
+	if [ "$#" -eq 0 ]; then
+    	echo "Usage: music-dl [url]"
+		exit 1
+	else 
+		URL=$1
+	fi
+
+	# Youtube-dl dry-run to get output file name.
+	DOWNLOAD_PATH=$(youtube-dl --get-filename "$YDL_FLAGS" "$URL")
+	FILENAME=$(echo $DOWNLOAD_PATH | awk -F$DOWNLOAD_DIR/ "{ print \$2 }")
+	echo "FILENAME: $FILENAME"
+	echo "OUTPUT PATH: $OUTPUT_DIR/${FILENAME%.webm}.mp3"
+
+	youtube-dl -f 251 "$URL" || echo "Something went wrong while downloading."
+	ffmpeg -i "$DOWNLOAD_PATH" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
+}
+
+main "$@"
