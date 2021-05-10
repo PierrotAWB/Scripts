@@ -33,19 +33,10 @@ main() {
 
 	youtube-dl -f 251 "$URL" || echo "Something went wrong while downloading."
 
-	# Completely janky way to handle start and end time handover to ffmpeg.
-	if [ -n "$START_TIME" ]; then
-		if [ -n "$END_TIME" ]; then
-			ffmpeg -i "$DOWNLOAD_PATH" -ss "$START_TIME" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
-		else 
-			ffmpeg -i "$DOWNLOAD_PATH" -ss "$START_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
-		fi
-	elif [ -n "$END_TIME" ]; then
-		ffmpeg -i "$DOWNLOAD_PATH" -ss "00:00" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
-	fi
-
 	if [ "$DO_CUT" = true ]; then
+		ffmpeg -i "$DOWNLOAD_PATH" -ss ${START_TIME-00:00} -to ${END_TIME-10:00:00} -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
 		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%CUT.webm}.mp3";
+		rm -f "${DOWNLOAD_PATH%.webm}CUT.webm"
 	else 
 		ffmpeg -i "$DOWNLOAD_PATH" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
 	fi
