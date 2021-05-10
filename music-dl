@@ -28,8 +28,8 @@ main() {
 	# Youtube-dl dry-run to get output file name.
 	DOWNLOAD_PATH=$(youtube-dl --get-filename "$YDL_FLAGS" "$URL")
 	FILENAME=$(echo $DOWNLOAD_PATH | awk -F$DOWNLOAD_DIR/ "{ print \$2 }")
-	echo "FILENAME: $FILENAME"
-	echo "OUTPUT PATH: $OUTPUT_DIR/${FILENAME%.webm}.mp3"
+	#echo "FILENAME: $FILENAME"
+	#echo "OUTPUT PATH: $OUTPUT_DIR/${FILENAME%.webm}.mp3"
 
 	youtube-dl -f 251 "$URL" || echo "Something went wrong while downloading."
 
@@ -41,11 +41,11 @@ main() {
 			ffmpeg -i "$DOWNLOAD_PATH" -ss "$START_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
 		fi
 	elif [ -n "$END_TIME" ]; then
-		ffmpeg -i "$DOWNLOAD_PATH" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm}"
+		ffmpeg -i "$DOWNLOAD_PATH" -ss "00:00" -to "$END_TIME" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
 	fi
 
 	if [ "$DO_CUT" = true ]; then
-		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
+		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%CUT.webm}.mp3";
 	else 
 		ffmpeg -i "$DOWNLOAD_PATH" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
 	fi
