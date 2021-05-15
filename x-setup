@@ -1,5 +1,5 @@
 #!/bin/sh
 
 xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources &
-xcompmgr -cfF -D5 > /dev/null 2>&1 &
+picom --config ${XDG_CONFIG_HOME:-$HOME/.config}/picom/picom.conf -b --experimental-backends
 xbindkeys -f ${XDG_CONFIG_HOME:-$HOME/.config}/xbindkeysrc 
