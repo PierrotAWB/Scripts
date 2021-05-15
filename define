@@ -2,7 +2,7 @@
 
 main() {
 	wordToDefine=$1
-	which dict > /dev/null || install 
+	which dict > /dev/null || echo "Please install dict."
 	
 	dict -d gcide $1 | less
 }
