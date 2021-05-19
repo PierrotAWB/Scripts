@@ -1,0 +1,14 @@
+#!/bin/bash
+
+currDir=$(pwd)
+
+# Should use env var
+cd ${1:-~/.local/bin/}
+
+target=$(fzf)
+
+if [ $target ]; then
+	vim $target
+fi
+
+cd $currDir
