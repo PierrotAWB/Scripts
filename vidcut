@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+
+# echo "Number of args: $#"
+
+if [[ "$#" -ne 4 ]]; then
+	echo "Usage: vidcut <input_file> <start_time> <duration> <out_file>"
+	exit 1
+fi
+
+ffmpeg -ss $2 -i $1 -c copy -t $3 $4

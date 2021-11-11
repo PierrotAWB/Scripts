@@ -1,5 +1,7 @@
-#!/bin/sh
+#!/bin/bash
 
 xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources &
-picom --config ${XDG_CONFIG_HOME:-$HOME/.config}/picom/picom.conf -b --experimental-backends
-xbindkeys -f ${XDG_CONFIG_HOME:-$HOME/.config}/xbindkeysrc 
+( ps aux | grep xcompmgr | grep -vq grep ) || xcompmgr &
+xbindkeys -f ${XDG_CONFIG_HOME:-$HOME/.config}/xbindkeysrc & 
+setxkbmap -option caps:escape & 
+xset r rate 200 50 & # Autorepeat rate: xset r rate <delay> <rate>
