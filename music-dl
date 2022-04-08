@@ -1,4 +1,4 @@
-#!/bin/bash
+#! /usr/bin/env bash
 
 YDL_FLAGS="-f 251"
 SAMPLING_RATE=48000
@@ -31,12 +31,12 @@ main() {
 
 
 	if [ "$DO_CUT" = true ]; then
-		youtube-dl -f 251 "$URL" || echo "Something went wrong while downloading."
+		youtube-dl --external-downloader=aria2c -f 251 "$URL" || echo "Something went wrong while downloading."
 		ffmpeg -i "$DOWNLOAD_PATH" -ss ${START_TIME-00:00} -to ${END_TIME-10:00:00} -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
 		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%CUT.webm}.mp3";
 		rm -f "${DOWNLOAD_PATH%.webm}CUT.webm"
 	else 
-		youtube-dl -x --audio-format mp3 $URL
+		youtube-dl --external-downloader=aria2c -x --audio-format mp3 $URL
 		mv "${DOWNLOAD_PATH%.webm}.mp3" "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
 	fi
 }

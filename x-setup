@@ -1,7 +1,11 @@
 #!/bin/bash
 
-xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources &
+# xrdb ${XDG_CONFIG_HOME:-$HOME/.config}/x11/xresources &
 ( ps aux | grep xcompmgr | grep -vq grep ) || xcompmgr &
 xbindkeys -f ${XDG_CONFIG_HOME:-$HOME/.config}/xbindkeysrc & 
 setxkbmap -option caps:escape & 
 xset r rate 200 50 & # Autorepeat rate: xset r rate <delay> <rate>
+xset -dpms s off
+
+# (Temporary) Swap alt and super
+# setxkbmap -option altwin:swap_alt_win

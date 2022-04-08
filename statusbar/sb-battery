@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/zsh
 
 # Courtesy of Luke Smith.
 
@@ -24,15 +24,16 @@ for battery in /sys/class/power_supply/BAT?*; do
 	[ -n "${capacity+x}" ] && printf " "
 	# Sets up the status and capacity
 	case "$(cat "$battery/status")" in
-		"Full") status="⚡" ;;
-		"Discharging") status="🔋" ;;
-		"Charging") status="🔌" ;;
-		"Not charging") status="🛑" ;;
-		"Unknown") status="♻️" ;;
+		"Full") bstatus="⚡" ;;
+		"Discharging") bstatus="🔋" ;;
+		"Charging") bstatus="🔌" ;;
+		"Not charging") bstatus="🛑" ;;
+		"Unknown") bstatus="♻️" ;;
 	esac
-	capacity=$(cat "$battery/capacity")
+	capacity=$(echo "scale=2; 100 * $(cat $battery/charge_now) / $(cat $battery/charge_full)" | bc)
+
 	# Will make a warn variable if discharging and low
-	[ "$status" = "🔋" ] && [ "$capacity" -le 25 ] && warn="❗"
+	[ "$bstatus" = "🔋" ] && [ "$capacity" -le 25 ] && warn="❗"
 	# Prints the info
-	printf "%s%s%d%%" "$status" "$warn" "$capacity"; unset warn
+	printf "%s%s%d%%" "$bstatus" "$warn" "$capacity"; unset warn
 done && exit 0

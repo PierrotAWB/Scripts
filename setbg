@@ -1,8 +1,8 @@
-#!/bin/sh
+# !/bin/sh
 
 if [ "$#" -eq 1 ]; then 
 	cp -T "$1" ~/pictures/background
+	wal -i "$(realpath "$1")"
 fi
 
-feh --no-fehbg --bg-scale ~/pictures/background
-
+feh --no-fehbg --bg-scale -Z ~/pictures/background

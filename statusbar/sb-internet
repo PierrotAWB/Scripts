@@ -21,7 +21,7 @@ esac
 for path in /sys/class/net/w*; do
 	ix=$(echo "$path" | sed 's/.*\/\(.*\)/\1/g')
 	if [ "$(cat $path/operstate 2>/dev/null)" = "up" ]; then
-		ssid="$(nmcli d show $ix | grep "GENERAL.CONNECTION" | awk '{ print $2 }')"
+		ssid="$(nmcli d show $ix | grep "GENERAL.CONNECTION" | tr -s ' ' | cut -d ' ' -f2- )"
 		break
 	fi
 done

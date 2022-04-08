@@ -41,7 +41,7 @@ config='-enable-python3interp=yes
 
 main () {
 	# Remove existing Vim installations
-	sudo $REMOVE_CMD vim vim-runtime || reportFailure "Remove existing packages"
+	sudo $REMOVE_CMD vim vim-runtime #|| reportFailure "Remove existing packages"
 
 	# Install dependencies
 	sudo $INSTALL_CMD $DEPEND || reportFailure "Install dependencies"

@@ -8,7 +8,7 @@ cd ${1:-~/.local/bin/}
 target=$(fzf)
 
 if [ $target ]; then
-	vim $target
+	$EDITOR $target
 fi
 
 cd $currDir
