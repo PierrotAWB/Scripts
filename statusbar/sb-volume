@@ -15,19 +15,18 @@ case $BLOCK_BUTTON in
 	6) "$TERMINAL" -e "$EDITOR" "$0" ;;
 esac
 
+[ $(pamixer --get-mute) = true ] && echo 🔇 && exit
 
-# amixer get Master | grep -q off && echo 🔇 && exit
-
-vol="$(amixer get Master | grep 'Left: Playback' | cut -d' ' -f7 | sed 's/[^0-9]//g')"
-
-[ -z "$vol" ] && echo 🔇 && exit
+vol="$(pamixer --get-volume)"
 
 if [ "$vol" -gt "70" ]; then
 	icon="🔊"
 elif [ "$vol" -gt "30" ]; then
 	icon="🔉"
-else
+elif [ "$vol" -gt "0" ]; then
 	icon="🔈"
+else
+        echo 🔇 && exit
 fi
 
 echo "$icon$vol%"

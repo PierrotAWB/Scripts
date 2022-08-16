@@ -5,7 +5,7 @@ pgrep -u "${USER:=$LOGNAME}" >/dev/null || { echo "$USER not logged in; sync wil
 
 DAY=$(date '+%a')
 
-FILES="/home/andrew/music /home/andrew/documents /home/andrew/.password-store /home/andrew/.local/bin /home/andrew/.local/share /usr/local/share/texmf/tex/latex/Andrew/Andrew.sty /var/spool/cron/andrew /etc/hosts /etc/profile /etc/fonts/local.conf"
+FILES="/home/andrew/music /home/andrew/documents /home/andrew/.password-store /home/andrew/.local/bin /home/andrew/.local/share /usr/local/share/texmf/tex/latex/Andrew/Andrew.sty /var/spool/cron/andrew /etc/hosts /etc/profile /etc/fonts/local.conf /etc/dnsmasq.conf"
 
 SNAR=data.snar
 TAR=data.${DAY}.tar.gz
@@ -20,12 +20,15 @@ RECIPIENT=andrewwang298@gmail.com
 UUID="60d17d09-5fe6-46bf-9e48-56aff3aa5d94"
 
 # Print start datetime.
-date '+%nBackup started at %F %r.'
+date '+Backup started at %F %r.'
 
 # Mount.
 $MOUNT "UUID=$UUID"
 
-if [ $DAY = 'Sun' ]; then
+# If oldest backup is older than a week old, stash it and start anew.
+if [ $(date -d "6 days 1 hour + $(ls -clt $BACKUP/*.gpg | tail -1 | tr -s ' ' | cut -d' ' -f6-8)" "+%s") -lt $(date "+%s") ]; then
+	printf "Current cycle is stale (oldest backup is from more than 6 days ago).\n"
+	printf "Archiving, and starting anew.\n"
 	LASTWEEK=$(date --date '7 days ago' +%F)
 	test -e $BACKUP/$SNAR && mv $BACKUP/$SNAR $BACKUP/${SNAR}.$LASTWEEK
 	mkdir $ARCHIVE/$LASTWEEK
@@ -44,3 +47,6 @@ sudo $MOUNT -o remount,ro "UUID=$UUID" && printf "Remount succeeded.\n"
 
 # Notify.
 notify-send 'Backup completed!' -t 5000
+
+# Print end datetime.
+date '+Backup completed at %F %r.'
