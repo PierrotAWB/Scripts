@@ -1,9 +1,12 @@
 #!/bin/sh
 
+request_install() {
+	echo "Please install dict (sudo pacman -Syu dictd)."
+	exit
+}
+
 main() {
-	wordToDefine=$1
-	which dict > /dev/null || echo "Please install dict."
-	
+	which dict > /dev/null || request_install
 	dict -d gcide $1 | less
 }
 

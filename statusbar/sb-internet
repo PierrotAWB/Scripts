@@ -28,6 +28,6 @@ done
 
 if [ "$ssid" ]; then
 	printf "📶 %s" "$ssid"
-else 
+else
 	printf "❎ %s" "Down"
 fi

@@ -5,7 +5,7 @@ pgrep -u "${USER:=$LOGNAME}" >/dev/null || { echo "$USER not logged in; sync wil
 
 DAY=$(date '+%a')
 
-FILES="/home/andrew/music /home/andrew/documents /home/andrew/.password-store /home/andrew/.local/bin /home/andrew/.local/share /usr/local/share/texmf/tex/latex/Andrew/Andrew.sty /var/spool/cron/andrew /etc/hosts /etc/profile /etc/fonts/local.conf /etc/dnsmasq.conf"
+FILES="/home/andrew/code /home/andrew/music /home/andrew/documents /home/andrew/.password-store /home/andrew/.local/bin /home/andrew/.local/share /usr/local/share/texmf/tex/latex/Andrew/Andrew.sty /var/spool/cron/andrew /etc/hosts /etc/profile /etc/fonts/local.conf /etc/dnsmasq.conf"
 
 SNAR=data.snar
 TAR=data.${DAY}.tar.gz

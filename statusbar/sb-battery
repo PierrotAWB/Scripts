@@ -30,7 +30,9 @@ for battery in /sys/class/power_supply/BAT?*; do
 		"Not charging") bstatus="🛑" ;;
 		"Unknown") bstatus="♻️" ;;
 	esac
-	capacity=$(echo "scale=2; 100 * $(cat $battery/charge_now) / $(cat $battery/charge_full)" | bc)
+	capacity=$(echo "scale=0; 100 * $(cat $battery/energy_now) / $(cat $battery/energy_full)" | bc)
+
+	[ $capacity -gt 100 ] && capcity = 100
 
 	# Will make a warn variable if discharging and low
 	[ "$bstatus" = "🔋" ] && [ "$capacity" -le 25 ] && warn="❗"
