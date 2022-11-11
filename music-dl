@@ -8,36 +8,36 @@ DOWNLOAD_DIR=$HOME/videos
 OUTPUT_DIR=$HOME/music
 DO_CUT=false
 
+print_usage() {
+	echo "Usage: music-dl [-s start_time] [-e end_time] <url>"
+}
+
 main() {
-	if [ "$#" -eq 0 ]; then
-    	echo "Usage: music-dl -i [url] [-s start_time] [-e end_time]"
-		exit 1
-	else
-		while getopts "i:s:e:" o; do case "${o}" in
-			i) URL=${OPTARG} ;;
-			s) START_TIME=${OPTARG}
-			   DO_CUT=true ;;
-			e) END_TIME=${OPTARG}
-			   DO_CUT=true ;;
-		esac done
-	fi
+	while getopts "s:e:" o; do case "${o}" in
+		s) START_TIME=${OPTARG}
+		   DO_CUT=true ;;
+		e) END_TIME=${OPTARG}
+		   DO_CUT=true ;;
+		*) print_usage ;;
+	esac done
+	URL=${*: -1}
 
 	if [ -z "$URL" ]; then
-		printf "Error: Expected URL.\nUsage: music-dl -i [url] [-s start_time] [-e end_time]\n"
+		print_usage
 		exit 1
 	fi
 
 	# Youtube-dl dry-run to get output file name.
 	DOWNLOAD_PATH=$(yt-dlp --get-filename "$YDL_FLAGS" "$URL")
-	FILENAME=$(echo $DOWNLOAD_PATH | awk -F$DOWNLOAD_DIR/ "{ print \$2 }")
+	FILENAME=$(echo "$DOWNLOAD_PATH" | awk -F"$DOWNLOAD_DIR"/ "{ print \$2 }")
 
 	if [ "$DO_CUT" = true ]; then
 		yt-dlp -f 251 "$URL" || echo "Something went wrong while downloading."
-		ffmpeg -i "$DOWNLOAD_PATH" -ss ${START_TIME-00:00} -to ${END_TIME-10:00:00} -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
+		ffmpeg -i "$DOWNLOAD_PATH" -ss "${START_TIME-00:00}" -to "${END_TIME-10:00:00}" -c copy "${DOWNLOAD_PATH%.webm}CUT.webm"
 		ffmpeg -i "${DOWNLOAD_PATH%.webm}CUT.webm" -vn -ab 128k -ar $SAMPLING_RATE -y "$OUTPUT_DIR/${FILENAME%CUT.webm}.mp3";
 		rm -f "${DOWNLOAD_PATH%.webm}CUT.webm"
 	else
-		yt-dlp -x --audio-format mp3 $URL
+		yt-dlp -x --audio-format mp3 "$URL"
 		mv "${DOWNLOAD_PATH%.webm}.mp3" "$OUTPUT_DIR/${FILENAME%.webm}.mp3";
 	fi
 }
